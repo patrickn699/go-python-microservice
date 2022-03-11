@@ -5,11 +5,18 @@ import (
 	"image"
 	"image/jpeg"
 	"image/png"
-	"os")
+	"os"
+	"io")
 
 func Convert_file(img string, height,width,percent,watermark int, filename string){
 
 	fmt.Println("Converting file: ", img)
+	
+	fil, er := os.Open("./converted")
+	fmt.Println(fil)
+	check_error(er)
+	//err := os.Mkdir("./converted", os.ModePerm)
+	//check_error(err)
 
 	opend, err := os.Open(img)
 	check_error(err)
@@ -24,12 +31,10 @@ func Convert_file(img string, height,width,percent,watermark int, filename strin
 		check_error(err)
 		my_sub_image := img.(interface {
 			SubImage(r image.Rectangle) image.Image
-		}).SubImage(image.Rect(0, 0, 10, 10))
+		}).SubImage(image.Rect(height, width, percent, watermark))
 	
-		output_file, outputErr := os.Create("output.jpeg")
-		if outputErr != nil {
-			fmt.Println(outputErr)
-		}
+		output_file, outputErr := os.Create("convert/op.jpeg")
+		check_error(outputErr)
 		jpeg.Encode(output_file, my_sub_image, nil)
 	
 	} else if format == "png" {
@@ -39,13 +44,14 @@ func Convert_file(img string, height,width,percent,watermark int, filename strin
 		check_error(err)
 		my_sub_image := img.(interface {
 			SubImage(r image.Rectangle) image.Image
-		}).SubImage(image.Rect(0, 0, 10, 10))
+		}).SubImage(image.Rect(height, width, percent, watermark))
 	
 		output_file, outputErr := os.Create("output.png")
-		if outputErr != nil {
-			fmt.Println(outputErr)
-		}
+		check_error(outputErr)
 		png.Encode(output_file, my_sub_image)
+		by,e := io.Copy(fil, output_file)
+		check_error(e)
+		fmt.Println("Bytes written: ", by)
 	}
 
 }

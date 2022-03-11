@@ -18,16 +18,23 @@ def index():
 def fil():
     if request.method == 'POST':
         file = request.files["file"]
+        height = request.form["height"]
+        width = request.form["width"]
+        percent = request.form["percent"]
+        water = request.form["watermark"]
         file.save('./saved/' + file.filename)
-        send_file('./saved/' + file.filename)
+        send_file('./saved/' + file.filename,height,width,percent,water)
         return redirect(url_for('index'))
 
 
-def send_file(filename):
+def send_file(filename,height,width,percent,water):
     url = "http://localhost:9000/convert"
     files = {'file': open(filename, 'rb')}
-    r = requests.post(url, files=files)
-    print("made a post request to conversion service:",r.text)
+    try:
+        r = requests.post(url, files=files,data={'height':height,'width':width,'percent':percent,'watermark':water})
+        print("made a post request to conversion service:",r.text)
+    except Exception as e:
+        return render_template('error.html', error=e)
 
 
 

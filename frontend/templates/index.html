@@ -8,12 +8,12 @@
 
 
 <form class="fileUpload" action="{{url_for('fil')}}", method="post" name="file" enctype="multipart/form-data" >
-    <input type="file" class="fileElem" multiple name="file" accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet">
+    <input type="file" class="fileElem" multiple name="file" accept="image/png, image/jpeg">
     <label class="fileSelect">Upload File</label>
-    <input type="number" name="height" placeholder="height of the image">
-    <input type="number" name="width" placeholder="width of the image">
-    <input type="number" name="percent" placeholder="enter percentage">
-    <input type="text" name="watermark" placeholder="enter watermark">
+    <input required type="text" name="height" placeholder="height of the image">
+    <input required type="text" name="width" placeholder="width of the image">
+    <input required type="text" name="percent" placeholder="x1 value">
+    <input required type="text" name="watermark" placeholder="y1 value">
     <input type="submit" value="Upload">
     <!--<h4>Usage</h4>
     <progress value="40" max="100"></progress>

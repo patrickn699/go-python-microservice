@@ -12,6 +12,7 @@ import (
 
 
 func main(){
+
 	fmt.Println("Hello World, from main")
 
 	mux := http.NewServeMux()
@@ -32,19 +33,20 @@ func cont(w http.ResponseWriter, r *http.Request){
 	width := r.FormValue("width")
 	percent := r.FormValue("percent")
 	watermark := r.FormValue("watermark")
+	fmt.Println(height)
 	height_int, err := strconv.Atoi(height)
 	check_error(err)
 	width_int, err := strconv.Atoi(width)
 	check_error(err)
 	percent_int, err := strconv.Atoi(percent)
 	check_error(err)
-	check_error(err)
+	watermark_int, err := strconv.Atoi(watermark)
 	defer file.Close()
 	fmt.Println(header.Filename)
 	f, err := os.OpenFile("./received/"+header.Filename, os.O_WRONLY|os.O_CREATE, 0666)
 	check_error(err)
 	io.Copy(f, file)
-	convert.Convert_file("img",height_int,width_int,percent_int,watermark)
+	convert.Convert_file("received/"+header.Filename,height_int,width_int,percent_int,watermark_int, header.Filename)
 }
 
 func check_error(err error){

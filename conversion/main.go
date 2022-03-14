@@ -47,6 +47,7 @@ func cont(w http.ResponseWriter, r *http.Request){
 	check_error(err)
 	io.Copy(f, file)
 	convert.Convert_file("received/"+header.Filename,height_int,width_int,percent_int,watermark_int, header.Filename)
+	convert.SendImageasPost()
 }
 
 func check_error(err error){

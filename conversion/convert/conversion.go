@@ -1,20 +1,25 @@
 package convert
 
 import (
+	"bytes"
 	"fmt"
 	"image"
 	"image/jpeg"
 	"image/png"
+	"io"
+	"io/ioutil"
+	"mime/multipart"
+	"net/http"
 	"os"
-	"io")
+)
 
 func Convert_file(img string, height,width,percent,watermark int, filename string){
 
 	fmt.Println("Converting file: ", img)
 	
-	fil, er := os.Open("./converted")
-	fmt.Println(fil)
-	check_error(er)
+	//fil, er := os.OpenFile("ccd/output.png", os.O_RDWR|os.O_CREATE, 0666)
+	//fmt.Println(fil)
+	//check_error(er)
 	//err := os.Mkdir("./converted", os.ModePerm)
 	//check_error(err)
 
@@ -33,9 +38,9 @@ func Convert_file(img string, height,width,percent,watermark int, filename strin
 			SubImage(r image.Rectangle) image.Image
 		}).SubImage(image.Rect(height, width, percent, watermark))
 	
-		output_file, outputErr := os.Create("convert/op.jpeg")
+		output_file, outputErr := os.Create("output.png")
 		check_error(outputErr)
-		jpeg.Encode(output_file, my_sub_image, nil)
+		png.Encode(output_file, my_sub_image)
 	
 	} else if format == "png" {
 		fmt.Println("File is png")
@@ -49,10 +54,46 @@ func Convert_file(img string, height,width,percent,watermark int, filename strin
 		output_file, outputErr := os.Create("output.png")
 		check_error(outputErr)
 		png.Encode(output_file, my_sub_image)
-		by,e := io.Copy(fil, output_file)
-		check_error(e)
-		fmt.Println("Bytes written: ", by)
+		//saved, er1 := os.OpenFile("output.png",os.O_RDWR|os.O_CREATE, 0666)
+		//check_error(er1)
+		//by,e := io.Copy(fil, saved)
+		//check_error(e)
+		//fmt.Println("Bytes written: ", by)
 	}
+
+}
+
+func SendImageasPost(){
+
+	file, err := os.Open("output.png")
+	check_error(err)
+	defer file.Close()
+
+	body := &bytes.Buffer{}
+	writer := multipart.NewWriter(body)
+	part, err := writer.CreateFormFile("image", "output.png")
+	check_error(err)
+
+	_, err = io.Copy(part, file)
+	check_error(err)
+	writer.Close()
+
+	request, err := http.NewRequest("POST", "http://127.0.0.1:5000/uploaded", body)
+	check_error(err)
+	
+
+	request.Header.Add("Content-Type", writer.FormDataContentType())
+	client := &http.Client{}
+	response, err := client.Do(request)
+	check_error(err)
+	//fmt.Println(request.Body)
+
+	defer response.Body.Close()
+	fmt.Println("from send data")
+	content, err := ioutil.ReadAll(response.Body)
+	check_error(err)
+	fmt.Println(string(content))
+
 
 }
 

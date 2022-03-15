@@ -3,6 +3,7 @@ from re import S
 from flask import render_template, request, redirect, url_for, Flask, send_from_directory
 from werkzeug.utils import secure_filename
 import requests
+from img_limit import check_n_imgs
 
 
 
@@ -14,7 +15,7 @@ app.config['UPLOAD_FOLDER'] = './cropped'
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
-    return render_template('index.html')
+    return render_template('in.html')
 
 
 @app.route('/fil', methods=['POST'])
@@ -25,7 +26,7 @@ def fil():
         width = request.form["width"]
         percent = request.form["percent"]
         water = request.form["watermark"]
-        file.save('./saved/' + file.filename)
+        file.save('./saved/' + secure_filename(file.filename))
         send_file('./saved/' + secure_filename(file.filename),height,width,percent,water)
         return redirect(url_for('download'))
 
@@ -45,13 +46,14 @@ def uploaded():
     if request.method == 'POST':
         file = request.files["image"]
         file.save('./cropped/' + secure_filename(file.filename))
+        check_n_imgs()
         #return send_from_directory('./cropped/', file.filename)
         return redirect(url_for('download'))
 
 
 @app.route('/download')
 def download():
-    return render_template('downloads.html')
+    return render_template('dwn.html')
     #return send_from_directory('./cropped/', 'cropped.jpg')
 
 

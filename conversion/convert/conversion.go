@@ -78,7 +78,7 @@ func SendImageasPost(){
 	check_error(err)
 	writer.Close()
 
-	request, err := http.NewRequest("POST", "http://127.0.0.1:5000/uploaded", body)
+	request, err := http.NewRequest("POST", "http://0.0.0.0:5000/uploaded", body)
 	check_error(err)
 	
 

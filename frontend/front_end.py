@@ -28,11 +28,15 @@ def fil():
         water = request.form["watermark"]
         file.save('./saved/' + secure_filename(file.filename))
         send_file('./saved/' + secure_filename(file.filename),height,width,percent,water)
-        return redirect(url_for('download'))
+        #return redirect(url_for('download'))
+        return render_template('dwn.html')
 
 
 def send_file(filename,height,width,percent,water):
-    url = "http://localhost:9000/convert"
+    ur = os.environ['CONV_SERVICE_HOST']
+    po = os.environ['CONV_SERVICE_PORT']
+    #url = "http://localhost:9000/convert"
+    url = "http://" + str(ur) + ":" + str(po) + "/convert"
     files = {'file': open(filename, 'rb')}
     try:
         r = requests.post(url, files=files,data={'height':height,'width':width,'percent':percent,'watermark':water})
@@ -46,7 +50,7 @@ def uploaded():
     if request.method == 'POST':
         file = request.files["image"]
         file.save('./cropped/' + secure_filename(file.filename))
-        check_n_imgs()
+        #check_n_imgs()
         #return send_from_directory('./cropped/', file.filename)
         return redirect(url_for('download'))
 
@@ -62,8 +66,8 @@ def download():
 def geti(filename):
     p = 'cropped'
     if os.listdir(p)!=[]:
-        return send_from_directory(directory='./cropped',filename=filename)
-    return render_template('downloads.html', error="No file to download")
+        return send_from_directory(directory='./cropped',path=filename)
+    return render_template('dwn.html', error="No file to download")
        
 
 
@@ -72,4 +76,4 @@ def geti(filename):
 
 
 if __name__ == '__main__':
-    app.run(debug=True,port=5000)
+    app.run(debug=True,host='0.0.0.0',port=5000)
